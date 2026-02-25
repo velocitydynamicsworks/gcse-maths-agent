@@ -2,131 +2,301 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>GCSE Maths AI Tutor</title>
   <style>
-    /* ===== GLOBAL STYLES ===== */
+
+    /* ===== RESET & BASE ===== */
     * { margin: 0; padding: 0; box-sizing: border-box; }
+
     body {
       font-family: 'Segoe UI', Arial, sans-serif;
       background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
       min-height: 100vh;
+      min-height: 100dvh; /* fixes mobile browser bar issue */
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 16px;
     }
+
+    /* ===== MAIN CARD ===== */
     .container {
       background: white;
       border-radius: 20px;
-      padding: 40px;
-      max-width: 800px;
+      padding: 28px 24px;
       width: 100%;
+      max-width: 800px;
       box-shadow: 0 25px 60px rgba(0,0,0,0.4);
     }
+
     /* ===== HEADER ===== */
-    .header { text-align: center; margin-bottom: 30px; }
-    .header h1 { font-size: 2rem; color: #1a56a6; margin-bottom: 8px; }
-    .header p { color: #6b7280; font-size: 1rem; }
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .header .emoji {
+      font-size: 2.8rem;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .header h1 {
+      font-size: clamp(1.4rem, 5vw, 2rem); /* scales with screen size */
+      color: #1a56a6;
+      margin-bottom: 6px;
+      line-height: 1.2;
+    }
+
+    .header p {
+      color: #6b7280;
+      font-size: clamp(0.85rem, 3vw, 1rem);
+      padding: 0 8px;
+    }
+
     .badge {
-      display: inline-block; background: #dcfce7; color: #166534;
-      padding: 4px 12px; border-radius: 20px; font-size: 0.85rem;
-      font-weight: 600; margin-top: 8px;
+      display: inline-block;
+      background: #dcfce7;
+      color: #166534;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-top: 8px;
     }
-    /* ===== QUICK TOPIC BUTTONS ===== */
-    .topics { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+
+    /* ===== TOPIC BUTTONS ===== */
+    .topics-label {
+      font-size: 0.85rem;
+      color: #6b7280;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .topics {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
     .topic-btn {
-      background: #f3f4f6; border: 2px solid #e5e7eb;
-      border-radius: 20px; padding: 6px 14px;
-      cursor: pointer; font-size: 0.85rem; transition: all 0.2s;
+      background: #f3f4f6;
+      border: 2px solid #e5e7eb;
+      border-radius: 20px;
+      padding: 8px 14px;
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      /* larger tap target for mobile */
+      min-height: 36px;
+      touch-action: manipulation;
     }
-    .topic-btn:hover { background: #1a56a6; color: white; border-color: #1a56a6; }
+
+    .topic-btn:hover,
+    .topic-btn:active {
+      background: #1a56a6;
+      color: white;
+      border-color: #1a56a6;
+    }
+
     /* ===== INPUT AREA ===== */
-    .input-area { display: flex; gap: 12px; margin-bottom: 20px; }
+    .input-area {
+      display: flex;
+      flex-direction: column; /* stack on mobile */
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
     textarea {
-      flex: 1; padding: 16px; border: 2px solid #e5e7eb;
-      border-radius: 12px; font-size: 1rem; resize: vertical;
-      min-height: 80px; font-family: inherit;
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      font-size: 1rem;
+      resize: vertical;
+      min-height: 100px;
+      font-family: inherit;
       transition: border-color 0.2s;
+      /* prevents iOS zoom on focus */
+      font-size: 16px;
     }
-    textarea:focus { outline: none; border-color: #1a56a6; }
+
+    textarea:focus {
+      outline: none;
+      border-color: #1a56a6;
+    }
+
     button#askBtn {
-      background: #1a56a6; color: white; border: none;
-      border-radius: 12px; padding: 16px 28px;
-      font-size: 1rem; font-weight: 600;
-      cursor: pointer; transition: background 0.2s;
-      white-space: nowrap; align-self: flex-end;
+      width: 100%;
+      background: #1a56a6;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+      /* better tap feel on mobile */
+      touch-action: manipulation;
+      min-height: 52px;
     }
+
     button#askBtn:hover { background: #1e40af; }
-    button#askBtn:disabled { background: #9ca3af; cursor: not-allowed; }
+    button#askBtn:active { background: #1e3a8a; transform: scale(0.98); }
+    button#askBtn:disabled { background: #9ca3af; cursor: not-allowed; transform: none; }
+
     /* ===== ANSWER BOX ===== */
     .answer-box {
-      background: #f8fafc; border: 2px solid #e2e8f0;
-      border-radius: 12px; padding: 24px;
-      min-height: 100px; display: none;
+      background: #f8fafc;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px;
+      display: none;
+      margin-top: 4px;
     }
+
     .answer-box.visible { display: block; }
-    .answer-box h3 { color: #1a56a6; margin-bottom: 12px; }
-    .answer-text { line-height: 1.8; color: #374151; white-space: pre-wrap; }
-    .loading { text-align: center; color: #6b7280; }
-    .loading::after {
-      content: ''; display: inline-block; width: 20px; height: 20px;
-      border: 3px solid #e5e7eb; border-top: 3px solid #1a56a6;
-      border-radius: 50%; animation: spin 1s linear infinite;
-      margin-left: 10px; vertical-align: middle;
+
+    .answer-box h3 {
+      color: #1a56a6;
+      margin-bottom: 12px;
+      font-size: 1rem;
     }
+
+    .answer-text {
+      line-height: 1.9;
+      color: #374151;
+      white-space: pre-wrap;
+      font-size: clamp(0.9rem, 3vw, 1rem);
+      word-break: break-word; /* prevents overflow on small screens */
+    }
+
+    /* ===== LOADING SPINNER ===== */
+    .loading {
+      text-align: center;
+      color: #6b7280;
+      padding: 12px 0;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 22px;
+      height: 22px;
+      border: 3px solid #e5e7eb;
+      border-top: 3px solid #1a56a6;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      vertical-align: middle;
+      margin-left: 10px;
+    }
+
     @keyframes spin { to { transform: rotate(360deg); } }
-    .error { color: #dc2626; background: #fef2f2; padding: 12px; border-radius: 8px; }
+
+    .error {
+      color: #dc2626;
+      background: #fef2f2;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    /* ===== FOOTER ===== */
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      color: #9ca3af;
+      font-size: 0.78rem;
+    }
+
+    /* ===== TABLET AND DESKTOP (side by side button) ===== */
+    @media (min-width: 600px) {
+      .container {
+        padding: 40px;
+      }
+
+      .input-area {
+        flex-direction: row; /* side by side on larger screens */
+        align-items: flex-end;
+      }
+
+      textarea {
+        flex: 1;
+        min-height: 80px;
+      }
+
+      button#askBtn {
+        width: auto;
+        padding: 16px 28px;
+        white-space: nowrap;
+        min-height: auto;
+      }
+    }
+
   </style>
 </head>
 <body>
   <div class="container">
+
     <div class="header">
-      <h1>🧠 GCSE Maths AI Tutor</h1>
+      <span class="emoji">🧮</span>
+      <h1>GCSE Maths AI Tutor</h1>
       <p>Ask any maths question and get clear, step-by-step answers</p>
-      <span class="badge">Functional Skills Level 2 • UK Standard</span>
+      <span class="badge">✅ Functional Skills Level 2 · UK Standard</span>
     </div>
 
+    <p class="topics-label">Quick topics:</p>
     <div class="topics">
-      <span>Quick topics:</span>
-      <button class="topic-btn" onclick="setTopic('percentages')">Percentages</button>
-      <button class="topic-btn" onclick="setTopic('fractions')">Fractions</button>
-      <button class="topic-btn" onclick="setTopic('algebra')">Algebra</button>
-      <button class="topic-btn" onclick="setTopic('ratio')">Ratio</button>
-      <button class="topic-btn" onclick="setTopic('area and perimeter')">Area & Perimeter</button>
-      <button class="topic-btn" onclick="setTopic('statistics')">Statistics</button>
-      <button class="topic-btn" onclick="setTopic('decimals')">Decimals</button>
+      <button class="topic-btn" onclick="setTopic('percentages')">📊 Percentages</button>
+      <button class="topic-btn" onclick="setTopic('fractions')">½ Fractions</button>
+      <button class="topic-btn" onclick="setTopic('algebra')">𝑥 Algebra</button>
+      <button class="topic-btn" onclick="setTopic('ratio')">⚖️ Ratio</button>
+      <button class="topic-btn" onclick="setTopic('area and perimeter')">📐 Area & Perimeter</button>
+      <button class="topic-btn" onclick="setTopic('statistics')">📈 Statistics</button>
+      <button class="topic-btn" onclick="setTopic('decimals')">🔢 Decimals</button>
+      <button class="topic-btn" onclick="setTopic('volume')">📦 Volume</button>
     </div>
 
     <div class="input-area">
-      <textarea id="questionInput"
-        placeholder="Type your maths question here... e.g. 'What is 35% of 240?'
-or 'Solve: 3x + 7 = 22' or 'How do I find the area of a circle?'">
-      </textarea>
-      <button id="askBtn" onclick="askQuestion()">Ask AI →</button>
+      <textarea
+        id="questionInput"
+        placeholder="Type your maths question here...&#10;&#10;e.g. 'What is 35% of 240?'&#10;or 'Solve: 3x + 7 = 22'&#10;or 'How do I find the area of a circle?'"
+      ></textarea>
+      <button id="askBtn" onclick="askQuestion()">Ask AI ✨</button>
     </div>
 
     <div class="answer-box" id="answerBox">
       <h3>📚 Answer</h3>
       <div class="answer-text" id="answerText"></div>
     </div>
+
+    <div class="footer">
+      Powered by Groq AI · Free to use · UK GCSE Standard
+    </div>
+
   </div>
 
   <script>
-    // Quick topic button fills in the textarea
+
+    // Quick topic button fills the textarea
     function setTopic(topic) {
       document.getElementById('questionInput').value =
         `Give me a practice question about ${topic} at GCSE Functional Skills Level 2, then solve it step by step.`;
+      // scroll down to the button smoothly on mobile
+      document.getElementById('askBtn').scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
-    // Main function that sends the question to our backend
+    // Main function that sends the question to the backend
     async function askQuestion() {
       const question = document.getElementById('questionInput').value.trim();
       const btn = document.getElementById('askBtn');
       const answerBox = document.getElementById('answerBox');
       const answerText = document.getElementById('answerText');
 
-      // Don't send empty questions
       if (!question) {
         alert('Please type a question first!');
         return;
@@ -136,11 +306,13 @@ or 'Solve: 3x + 7 = 22' or 'How do I find the area of a circle?'">
       btn.disabled = true;
       btn.textContent = 'Thinking...';
       answerBox.className = 'answer-box visible';
-      answerText.innerHTML = '<div class="loading">Your AI tutor is working it out</div>';
+      answerText.innerHTML = '<div class="loading">Your AI tutor is working it out <span class="spinner"></span></div>';
 
-      // Send question to Flask backend
+      // Scroll to answer on mobile so user sees it appearing
+      answerBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
       try {
-        const response = await fetch('http://127.0.0.1:5000/ask', {
+        const response = await fetch('https://gcse-maths-agent.onrender.com/ask', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ question: question })
@@ -149,30 +321,31 @@ or 'Solve: 3x + 7 = 22' or 'How do I find the area of a circle?'">
         const data = await response.json();
 
         if (data.error) {
-          answerText.innerHTML = `<div class="error">Error: ${data.error}</div>`;
+          answerText.innerHTML = `<div class="error">⚠️ Error: ${data.error}</div>`;
         } else {
           answerText.textContent = data.answer;
         }
 
       } catch (error) {
         answerText.innerHTML = `<div class="error">
-          Could not connect to the server. Make sure your Flask app is running!
-          (Run: python app.py in your terminal)
+          ⚠️ Could not connect to the server.<br><br>
+          If you are running this locally, make sure Flask is running with: <strong>python app.py</strong>
         </div>`;
       }
 
       // Restore button
       btn.disabled = false;
-      btn.textContent = 'Ask AI →';
+      btn.textContent = 'Ask AI ✨';
     }
 
-    // Allow pressing Enter + Shift to submit (Enter alone = new line)
+    // Press Enter to submit (Shift+Enter = new line)
     document.getElementById('questionInput').addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
         askQuestion();
       }
     });
+
   </script>
 </body>
 </html>
