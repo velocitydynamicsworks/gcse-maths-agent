@@ -1,6 +1,8 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from groq import Groq
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 import os
 from dotenv import load_dotenv
 
@@ -9,7 +11,12 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
-# Groq client setup
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["200 per day", "30 per hour"]
+)
+
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 SYSTEM_PROMPT = """You are a friendly and patient GCSE Maths tutor specialising in
@@ -26,7 +33,13 @@ When answering questions:
    Geometry, Measures, Statistics, and Problem Solving
 7. Always end with a tip or encouragement"""
 
+# Serve the frontend homepage
+@app.route('/')
+def home():
+    return send_from_directory('.', 'index.html')
+
 @app.route('/ask', methods=['POST'])
+@limiter.limit("20 per hour")
 def ask_question():
     try:
         data = request.get_json()
@@ -34,6 +47,9 @@ def ask_question():
 
         if not question:
             return jsonify({'error': 'No question provided'}), 400
+
+        if len(question) > 1000:
+            return jsonify({'error': 'Question is too long. Please keep it under 1000 characters.'}), 400
 
         response = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
