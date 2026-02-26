@@ -323,7 +323,7 @@
       answerText.innerHTML = '<div class="loader">Computing logic...</div>';
 
       try {
-        const response = await fetch('https://gcse-maths-agent.onrender.com/ask', {
+        const response = await fetch('/ask', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ question: question })
